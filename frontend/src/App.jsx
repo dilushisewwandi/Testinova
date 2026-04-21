@@ -1,34 +1,50 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react"
+import { Route, Routes } from "react-router-dom"
+import LandingPage from "./pages/LandingPage"
+import SelectRole from "./pages/SelectRole"
+import DeveloperDashboard from "./pages/dashboards/DeveloperDashboard"
+import QADashboard from "./pages/dashboards/QADashboard"
+import StudentDashboard from "./pages/dashboards/StudentDashboard"
+import TestGeneration from "./pages/TestGeneration"
+import Signup from "./pages/Signup"
+import Login from "./pages/Login"
+import LearningPage from "./pages/LearningPage"
+import PracticePage from "./pages/PracticePage"
+import DeveloperTestHistory from "./pages/DeveloperTestHistory"
+import QATestHistory from "./pages/QATestHistory"
+// import QualityReports from "./pages/QualityReports"
+import DeveloperReports from "./pages/DeveloperReports"
+import QACoverage from "./pages/QACoverage"
+import QACoverageReports from "./pages/QACoverageReports"
+import StudentLearningHistory from "./pages/StudentLearningHistory"
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+const App = () => {
+  return(
+    <div>
+      <Routes>
+        <Route path='/' element={<LandingPage/>}/>
+        <Route path='/select-role' element={<SelectRole/>}/>
+        <Route path='/signup' element={<Signup/>}/>
+        <Route path='/login' element={<Login/>}/>
+        <Route path="/dashboard/developer" element={<DeveloperDashboard/>}/>
+        <Route path="/dashboard/qa" element={<QADashboard/>}/>
+        <Route path="/dashboard/student" element={<StudentDashboard/>}/>
+        <Route path="/developer/generate-test" element={<TestGeneration role={"developer"}/>}/>
+        <Route path="/developer/test-history" element={<DeveloperTestHistory role={"developer"}/>}/>
+        <Route path="/qa/test-history" element={<QATestHistory role={"qa"}/>}/>
+        <Route path="/qa/generate-test" element={<TestGeneration role={"qa"}/>}/>
+        {/* <Route path="/qa/quality-reports" element={<QualityReports role={"qa"}/>}/> */}
+        <Route path="/reports/developer" element={<DeveloperReports />} />
+        {/* <Route path="/qa-report" element={<QualityReports />} /> */}
+        <Route path="/qa/coverage-report" element={<QACoverage />} />
+        <Route path="/reports/qa" element={<QACoverageReports />} />
+        <Route path="/student/generate-test" element={<TestGeneration role={"student"}/>}/>
+        <Route path="/student/learn" element={<LearningPage />}/>
+        <Route path="/student/practice" element={<PracticePage/>}/>
+        <Route path="/student/learning-history" element={<StudentLearningHistory />}/>
+       
+      </Routes>
+    </div>
   )
 }
 
