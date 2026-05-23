@@ -1,9 +1,8 @@
-from pydantic import BaseModel # type: ignore
-# from typing import Optional
+from pydantic import BaseModel
 
 class TestRequest(BaseModel):
-    role:str
-    framework:str|None=None
-    requirementText:str
-    testType:str|None=None
-    testSubType:str |None=None
+    role: str
+    framework: str | None = None
+    requirement: str
+    testType: str | None = None
+    testSubType: str | None = None
