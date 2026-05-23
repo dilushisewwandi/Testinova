@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
   res.send("Express backend is running!");
 });
 
-sequelize.sync({ alter: true })
+sequelize.sync()
   .then(() => {
     console.log("Database synced successfully");
   })
@@ -35,31 +35,10 @@ sequelize.sync({ alter: true })
     console.error("Database sync error:", err);
   });
 
-
-// Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Something went wrong!" });
 });
-
-// Forward requests to FastAPI
-// app.post("/generate-test", async (req, res) => {
-//   try {
-//     const response = await axios.post("http://localhost:8000/generate-test", req.body);
-//     res.json(response.data);
-//   } catch (error) {
-//     console.error("Backend error:", error.message);
-//     res.status(500).json({
-//       role: req.body.role,
-//       requirementText: req.body.requirementText,
-//       parsed: {},
-//       templateHint: "Error",
-//       template: "",
-//       testCode: `// Backend error: ${error.message}`
-//     });
-
-//   }
-// });
 
 const PORT = 5000;
 app.listen(PORT, () => {

@@ -11,24 +11,19 @@ export const signup = async (req, res) => {
   let{ username, email, password } = req.body;
 
   try {
-
-    //avoid spaces
     username = username?.trim();
     email = email?.trim();
     password = password?.trim();
 
-    //validate username
     if(!username || username.length <3){
       return res.status(400).json({message:"Username is too short!"});
     }
 
-    //validate email
     const emailRegex = /^\S+@\S+\.\S+$/;
     if(!email || !emailRegex.test(email)){
       return res.status(400).json({message:"This email is not valid"});
     }
 
-    //password validation
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     if(!password || !passwordRegex.test(password)){
       return res.status(400).json({message:"This password is not valid"});

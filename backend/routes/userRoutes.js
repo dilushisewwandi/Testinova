@@ -6,5 +6,6 @@ import { verifyToken } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 router.put("/set-role", verifyToken, setRole);
+router.post("/set-role", verifyToken, setRole);
 
 export default router;
