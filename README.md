@@ -103,12 +103,6 @@ Suggested test cases to document or implement:
 - End‑to‑end: create a user, submit requirement, receive generated tests, and confirm history records.
 - Error handling: AI service timeouts, backend DB connection failures, invalid inputs.
 
-What to add to make this project stronger for a QA internship:
-- Add automated test suites with badges (API unit tests, E2E tests) and CI (GitHub Actions).
-- Add a `tests/` folder with example test flows and a small `README_TESTING.md` showing how to run them locally.
-- Provide a mock OpenAI server or recorded responses so CI does not depend on external API calls.
-- Add coverage reports and an explanation of quality metrics the app records.
-
 ## 📁 Project Structure (high level)
 - `ai-service/` — NLP & test generation API (FastAPI + spaCy + OpenAI calls)
 - `backend/` — Express API, database models, controllers for tests and users
