@@ -1,22 +1,6 @@
-# import spacy
-# nlp = spacy.load("en_core_web_sm")
-
-# def parse_requirement(requirement: str) -> dict:
-#     words = requirement.split()
-#     return{
-#         "tokens": words,
-#         "conditions": [w for w in words if w.lower() in ["if", "when", "unless"]],
-#         "actions": [w for w in words if w.lower() in ["fail", "succeed", "return", "display", "pass"]],
-#     }
-
-
-
-
 import spacy
 
-# Load the spaCy English model
 nlp = spacy.load("en_core_web_sm")
-
 
 def parse_requirement(requirement: str) -> dict:
     """
@@ -24,16 +8,13 @@ def parse_requirement(requirement: str) -> dict:
     information from a natural language requirement string.
     This parsed data is used to enrich the prompt sent to the LLM.
     """
-
-    # Run spaCy NLP pipeline on the requirement text
+    
     doc = nlp(requirement)
 
-    # ── Tokens ───────────────────────────────────────────────
-    # All word tokens from the requirement
+    #Tokens
     tokens = [token.text for token in doc if not token.is_space]
 
-    # ── Named Entities ────────────────────────────────────────
-    # Real-world objects like system names, tools, organizations
+    #Named Entities
     entities = [
         {
             "text": ent.text,
@@ -43,8 +24,7 @@ def parse_requirement(requirement: str) -> dict:
         for ent in doc.ents
     ]
 
-    # ── Conditions ────────────────────────────────────────────
-    # Extracted using dependency parsing + conditional keywords
+    #Conditions
     condition_keywords = {
         "if", "when", "unless", "until", "while",
         "whenever", "once", "after", "before", "in case"
@@ -52,13 +32,11 @@ def parse_requirement(requirement: str) -> dict:
     conditions = []
     for token in doc:
         if token.text.lower() in condition_keywords:
-            # Grab the full subtree of this condition clause
             subtree_text = " ".join([t.text for t in token.subtree])
             if subtree_text not in conditions:
                 conditions.append(subtree_text)
 
-    # ── Actions ───────────────────────────────────────────────
-    # Extracted using POS tagging (VERB) + domain keywords
+    #Actions 
     action_keywords = {
         "fail", "succeed", "return", "display", "pass",
         "submit", "click", "enter", "validate", "check",
@@ -69,70 +47,51 @@ def parse_requirement(requirement: str) -> dict:
     }
     actions = []
     for token in doc:
-        # Detect verbs using spaCy POS tagging
         if token.pos_ == "VERB" and not token.is_stop:
             lemma = token.lemma_.lower()
             if lemma not in actions:
                 actions.append(lemma)
-        # Also detect important domain action keywords
         elif token.text.lower() in action_keywords:
             if token.text.lower() not in actions:
                 actions.append(token.text.lower())
 
-    # ── Subjects ─────────────────────────────────────────────
-    # Who or what is performing the action
+    #Subjects
     subjects = []
     for token in doc:
         if token.dep_ in ("nsubj", "nsubjpass"):
             if token.text.lower() not in subjects:
                 subjects.append(token.text)
 
-    # ── Objects ───────────────────────────────────────────────
-    # What the action is being performed on
+    #Objects
     objects = []
     for token in doc:
         if token.dep_ in ("dobj", "pobj", "attr", "iobj"):
             if token.text.lower() not in objects:
                 objects.append(token.text)
 
-    # ── Negations ─────────────────────────────────────────────
-    # Detect negative scenarios (important for test cases)
+    #Negations
     negations = []
     for token in doc:
         if token.dep_ == "neg":
             negations.append(token.head.text)
 
-    # ── Test Type Hints ───────────────────────────────────────
-    # Detect what kind of test this requirement suggests
+    #Test Type Hints
     req_lower = requirement.lower()
     test_type_hints = []
 
-    if any(w in req_lower for w in [
-        "unit", "function", "method", "class", "module"
-    ]):
+    if any(w in req_lower for w in ["unit", "function", "method", "class", "module"]):
         test_type_hints.append("unit")
 
-    if any(w in req_lower for w in [
-        "integration", "service", "api", "endpoint",
-        "database", "connect", "microservice"
-    ]):
+    if any(w in req_lower for w in ["integration", "service", "api", "endpoint", "database", "connect", "microservice"]):
         test_type_hints.append("integration")
 
-    if any(w in req_lower for w in [
-        "ui", "button", "form", "page", "screen",
-        "click", "interface", "input", "dropdown",
-        "modal", "popup", "menu", "link"
-    ]):
+    if any(w in req_lower for w in ["ui", "button", "form", "page", "screen", "click", "interface", "input", "dropdown", "modal", "popup", "menu", "link"]):
         test_type_hints.append("ui")
 
-    if any(w in req_lower for w in [
-        "workflow", "flow", "process", "journey",
-        "scenario", "step", "sequence", "pipeline"
-    ]):
+    if any(w in req_lower for w in ["workflow", "flow", "process", "journey", "scenario", "step", "sequence", "pipeline"]):
         test_type_hints.append("workflow")
 
-    # ── Complexity Estimation ─────────────────────────────────
-    # Based on sentence count and token count
+    #Complexity Estimation 
     sentences = [sent.text.strip() for sent in doc.sents]
     token_count = len(tokens)
 
@@ -143,8 +102,7 @@ def parse_requirement(requirement: str) -> dict:
     else:
         complexity = "complex"
 
-    # ── Keywords ──────────────────────────────────────────────
-    # Important non-stopword nouns and verbs
+    #keywords
     keywords = [
         token.text for token in doc
         if not token.is_stop
