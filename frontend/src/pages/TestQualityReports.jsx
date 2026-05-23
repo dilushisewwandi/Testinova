@@ -1,262 +1,13 @@
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-
-// export default function TestQualityReports() {
-//   const [tests, setTests] = useState([]);
-
-//   useEffect(() => {
-//     const fetchTests = async () => {
-//       const token = localStorage.getItem("token");
-//       try {
-//         const res = await axios.get(
-//           "http://localhost:5000/api/quality/quality-report",
-//           { headers: { Authorization: `Bearer ${token}` } }
-//         );
-//         setTests(res.data.reports);
-//       } catch (err) {
-//         console.error("Error fetching test reports:", err);
-//       }
-//     };
-
-//     fetchTests();
-//   }, []);
-
-//   if (!tests.length) return <div className="p-6">No tests generated yet.</div>;
-
-//   return (
-//     <div className="p-6 space-y-6">
-//       <h1 className="text-3xl font-bold">Per-Test Quality Reports</h1>
-
-//       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-//         {tests.map((t) => (
-//           <TestCard key={t.id} test={t} />
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
-
-// function TestCard({ test }) {
-//   const [showFeedback, setShowFeedback] = useState(false);
-
-//   return (
-//     <div className="bg-white rounded-2xl shadow-md p-5">
-//       <h2 className="text-xl font-semibold">{test.testType} Test</h2>
-//       <p className="text-sm text-gray-500 mb-2">Framework: {test.framework}</p>
-
-//       <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
-//         <div
-//           className="bg-blue-600 h-4 rounded-full"
-//           style={{ width: `${test.qualityScore}%` }}
-//         ></div>
-//       </div>
-//       <p className="text-sm mb-2">Quality Score: {test.qualityScore}%</p>
-
-//       {test.coverageEstimate != null && (
-//         <p className="text-sm mb-2">Coverage Estimate: {test.coverageEstimate}%</p>
-//       )}
-
-//       <button
-//         className="text-blue-600 text-sm font-medium underline mb-2"
-//         onClick={() => setShowFeedback(!showFeedback)}
-//       >
-//         {showFeedback ? "Hide Feedback" : "Show Feedback"}
-//       </button>
-
-//       {/* {showFeedback && Array.isArray(test.feedback) && test.feedback.length > 0 &&  (
-//         <ul className="list-disc list-inside text-sm text-gray-600">
-//           {test.feedback.map((f, idx) => (
-//             <li key={idx}>{f}</li>
-//           ))} */}
-//           {showFeedback && Array.isArray(test.feedback) && (
-//   <ul className="text-sm">
-//     {test.feedback.map((f, idx) => (
-//       <li
-//         key={idx}
-//         className={
-//           f.type === "error"
-//             ? "text-red-600"
-//             : f.type === "warning"
-//             ? "text-yellow-600"
-//             : "text-gray-600"
-//         }
-//       >
-//         {f.message}
-//       </li>
-//     ))}
-//     {showFeedback && (!test.feedback || test.feedback.length === 0) && (
-//             <p className="text-sm text-gray-400">No issues found 🎉</p>
-//           )}
-//   </ul>
-// )}
-          
-//       {test.breakdown && (
-//   <div className="mt-3 text-sm text-gray-600">
-//     <p>Assertions: {test.breakdown.assertions || 0}</p>
-//     <p>Diversity: {test.breakdown.diversity || 0}</p>
-//     <p>Structure: {test.breakdown.structure || 0}</p>
-//     <p>Length: {test.breakdown.length || 0}</p>
-//     <p>Formatting: {test.breakdown.formatting || 0}</p>
-//   </div>
-// )}
-
-//       <p className="text-xs text-gray-400 mt-2">
-//         Generated: {new Date(test.createdAt).toLocaleString()}
-//       </p>
-//     </div>
-//   );
-// }
-
-
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-
-// export default function TestQualityReports() {
-//   const [tests, setTests] = useState([]);
-
-//   useEffect(() => {
-//     const fetchTests = async () => {
-//       const token = localStorage.getItem("token");
-
-//       try {
-//         const res = await axios.get(
-//           "http://localhost:5000/api/quality/quality-report",
-//           {
-//             headers: { Authorization: `Bearer ${token}` },
-//           }
-//         );
-
-//         setTests(res.data.reports || []);
-//       } catch (err) {
-//         console.error("Error fetching test reports:", err);
-//       }
-//     };
-
-//     fetchTests();
-//   }, []);
-
-//   if (!tests.length) {
-//     return <div className="p-6">No tests generated yet.</div>;
-//   }
-
-//   return (
-//     <div className="p-6 space-y-6">
-//       <h1 className="text-3xl font-bold">Per-Test Quality Reports</h1>
-
-//       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-//         {tests.map((t) => (
-//           <TestCard key={t.id} test={t} />
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
-
-// function TestCard({ test }) {
-//   const [showFeedback, setShowFeedback] = useState(false);
-
-//   const normalizedFeedback = Array.isArray(test.feedback)
-//     ? test.feedback.map((f) =>
-//         typeof f === "string"
-//           ? { type: "warning", message: f }
-//           : f
-//       )
-//     : [];
-
-//   return (
-//     <div className="bg-white rounded-2xl shadow-md p-5">
-//       <h2 className="text-xl font-semibold">
-//         {test.testType || "Test"}
-//       </h2>
-
-//       <p className="text-sm text-gray-500 mb-2">
-//         Framework: {test.framework || "-"}
-//       </p>
-
-//       {/* Quality Bar */}
-//       <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
-//         <div
-//           className="bg-blue-600 h-4 rounded-full"
-//           style={{ width: `${test.qualityScore || 0}%` }}
-//         ></div>
-//       </div>
-
-//       <p className="text-sm mb-2">
-//         Quality Score: {test.qualityScore || 0}%
-//       </p>
-
-//       {/* Coverage */}
-//       {test.coverageEstimate != null && (
-//         <p className="text-sm mb-2">
-//           Coverage Estimate: {test.coverageEstimate}%
-//         </p>
-//       )}
-
-//       {/* Toggle */}
-//       <button
-//         className="text-blue-600 text-sm font-medium underline mb-2"
-//         onClick={() => setShowFeedback(!showFeedback)}
-//       >
-//         {showFeedback ? "Hide Feedback" : "Show Feedback"}
-//       </button>
-
-//       {showFeedback && (
-//         <>
-//           {normalizedFeedback.length > 0 ? (
-//             <ul className="text-sm space-y-1">
-//               {normalizedFeedback.map((f, idx) => (
-//                 <li
-//                   key={idx}
-//                   className={
-//                     f.type === "error"
-//                       ? "text-red-600"
-//                       : f.type === "warning"
-//                       ? "text-yellow-600"
-//                       : "text-gray-600"
-//                   }
-//                 >
-//                   • {f.message}
-//                 </li>
-//               ))}
-//             </ul>
-//           ) : (
-//             <p className="text-sm text-gray-400">
-//               No issues found 🎉
-//             </p>
-//           )}
-//         </>
-//       )}
-
-//       {test.breakdown ? (
-//         <div className="mt-3 text-sm text-gray-600">
-//           <p>Assertions: {test.breakdown.assertions ?? "-"}</p>
-//           <p>Diversity: {test.breakdown.diversity ?? "-"}</p>
-//           <p>Structure: {test.breakdown.structure ?? "-"}</p>
-//           <p>Length: {test.breakdown.length ?? "-"}</p>
-//           <p>Formatting: {test.breakdown.formatting ?? "-"}</p>
-//         </div>
-//       ) : (
-//         <p className="text-xs text-gray-400 mt-2">
-//           No detailed breakdown available
-//         </p>
-//       )}
-
-//       {/* Date */}
-//       <p className="text-xs text-gray-400 mt-2">
-//         Generated:{" "}
-//         {test.createdAt
-//           ? new Date(test.createdAt).toLocaleString()
-//           : "-"}
-//       </p>
-//     </div>
-//   );
-// }
-
-
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { BarChart3, ChevronDown, ChevronUp, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
+import {
+  BarChart3,
+  ChevronDown,
+  ChevronUp,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+} from "lucide-react";
 
 export default function TestQualityReports() {
   const [tests, setTests] = useState([]);
@@ -281,9 +32,7 @@ export default function TestQualityReports() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="p-6 text-gray-500">Loading quality reports...</div>
-    );
+    return <div className="p-6 text-gray-500">Loading quality reports...</div>;
   }
 
   if (!tests.length) {
@@ -303,10 +52,10 @@ export default function TestQualityReports() {
       : "developer";
   };
 
-  // only show developer tests that have quality scores
   const developerTests = tests.filter(
     (t) => resolvedRole(t) === "developer" && t.qualityScore !== null
   );
+
   const qaTests = tests.filter(
     (t) => resolvedRole(t) === "qa" && t.qualityScore !== null
   );
@@ -318,12 +67,8 @@ export default function TestQualityReports() {
           <BarChart3 className="text-[#1A3FFF]" />
           Quality Reports
         </h1>
-        <p className="text-gray-500 mt-1">
-          Detailed breakdown of every generated test
-        </p>
       </div>
 
-      {/* Developer Tests */}
       {developerTests.length > 0 && (
         <section>
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
@@ -337,7 +82,6 @@ export default function TestQualityReports() {
         </section>
       )}
 
-      {/* QA Tests */}
       {qaTests.length > 0 && (
         <section>
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
@@ -354,8 +98,10 @@ export default function TestQualityReports() {
   );
 }
 
+/* ---------------- SCORE BAR ---------------- */
 function ScoreBar({ value, max = 100, color = "bg-blue-500" }) {
   const pct = Math.min((value / max) * 100, 100);
+
   return (
     <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
       <div
@@ -366,32 +112,135 @@ function ScoreBar({ value, max = 100, color = "bg-blue-500" }) {
   );
 }
 
+/* ---------------- TEST CARD ---------------- */
 function TestCard({ test }) {
   const [showDetails, setShowDetails] = useState(false);
 
-  const normalizedFeedback = Array.isArray(test.feedback)
-    ? test.feedback.map((f) =>
+  const rawFeedback =
+    typeof test.feedback === "string"
+      ? (() => {
+          try {
+            return JSON.parse(test.feedback);
+          } catch {
+            return [];
+          }
+        })()
+      : test.feedback;
+
+  const normalizedFeedback = Array.isArray(rawFeedback)
+    ? rawFeedback.map((f) =>
         typeof f === "string" ? { type: "warning", message: f } : f
       )
     : [];
 
+  const score = test.qualityScore ?? 0;
+
   const scoreColor =
-    test.qualityScore >= 75
+    score >= 75
       ? "text-green-600"
-      : test.qualityScore >= 50
+      : score >= 50
       ? "text-yellow-600"
       : "text-red-600";
 
   const barColor =
-    test.qualityScore >= 75
+    score >= 75
       ? "bg-green-500"
-      : test.qualityScore >= 50
+      : score >= 50
       ? "bg-yellow-500"
       : "bg-red-500";
 
+  let breakdown = test.breakdown || {};
+  if (typeof breakdown === "string") {
+    try {
+      breakdown = JSON.parse(breakdown);
+    } catch {
+      breakdown = {};
+    }
+  }
+
+  const assertionValue =
+    breakdown.assertions ??
+    breakdown.assertionStrength ??
+    breakdown.assertionScore ??
+    null;
+
+  const diversityValue =
+    breakdown.diversity ??
+    breakdown.testDiversity ??
+    breakdown.diversityScore ??
+    null;
+
+  const structureValue =
+    breakdown.structure ??
+    breakdown.frameworkStructure ??
+    breakdown.structureScore ??
+    null;
+
+  const codeLengthValue =
+    typeof breakdown.codeLength === "number"
+      ? breakdown.codeLength
+      : typeof breakdown.length === "number"
+      ? breakdown.length
+      : null;
+
+  const formattingValue =
+    breakdown.formatting ?? breakdown.formattingScore ?? null;
+
+  // const getIcon = (type) => {
+  //   if (type === "error") return <XCircle className="w-4 h-4 text-red-500" />;
+  //   if (type === "warning")
+  //     return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
+  //   return <CheckCircle className="w-4 h-4 text-green-500" />;
+  // };
+
+  const getIcon = (type) => {
+  switch (type) {
+    case "error":
+      return <XCircle className="w-4 h-4 text-red-500" />;
+
+    case "warning":
+      return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
+
+    case "info":
+      return <CheckCircle className="w-4 h-4 text-blue-500" />;
+
+    case "success":
+      return <CheckCircle className="w-4 h-4 text-green-500" />;
+
+    default:
+      return <CheckCircle className="w-4 h-4 text-gray-500" />;
+  }
+};
+
+  // const getTextColor = (type) => {
+  //   if (type === "error") return "text-red-600";
+  //   if (type === "warning") return "text-yellow-700";
+  //   return "text-green-700";
+  // };
+
+  const getTextColor = (type) => {
+  switch (type) {
+    case "error":
+      return "text-red-600";
+
+    case "warning":
+      return "text-yellow-700";
+
+    case "info":
+      return "text-blue-600";
+
+    case "success":
+      return "text-green-600";
+
+    default:
+      return "text-gray-700";
+  }
+};
+
   return (
     <div className="bg-white rounded-2xl shadow-md p-5 border border-gray-100 hover:shadow-lg transition duration-300">
-      {/* Header */}
+      
+      {/* HEADER */}
       <div className="flex justify-between items-start mb-3">
         <div>
           <h3 className="font-semibold text-gray-800 capitalize">
@@ -404,26 +253,15 @@ function TestCard({ test }) {
               : "-"}
           </p>
         </div>
+
         <span className={`text-2xl font-bold ${scoreColor}`}>
-          {test.qualityScore ?? 0}%
+          {score}%
         </span>
       </div>
 
-      {/* Quality Score Bar */}
-      <ScoreBar value={test.qualityScore ?? 0} color={barColor} />
-      <p className="text-xs text-gray-500 mb-3">Quality Score</p>
+      <ScoreBar value={score} color={barColor} />
 
-      {/* Coverage (QA only) */}
-      {test.coverageEstimate != null && test.coverageEstimate > 0 && (
-        <>
-          <ScoreBar value={test.coverageEstimate} color="bg-purple-500" />
-          <p className="text-xs text-gray-500 mb-3">
-            Coverage: {test.coverageEstimate}%
-          </p>
-        </>
-      )}
-
-      {/* Toggle Details Button */}
+      {/* DETAILS BUTTON */}
       <button
         onClick={() => setShowDetails(!showDetails)}
         className="w-full flex items-center justify-between text-sm text-[#1A3FFF] font-medium py-2 border-t border-gray-100 mt-2"
@@ -436,85 +274,43 @@ function TestCard({ test }) {
         )}
       </button>
 
+      {/* DETAILS */}
       {showDetails && (
         <div className="mt-3 space-y-4">
 
-          {/* Breakdown Section - only for developer tests */}
-          {test.breakdown ? (
+          {Object.keys(breakdown).length > 0 && (
             <div className="bg-gray-50 rounded-xl p-4">
               <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-3">
                 Score Breakdown
               </p>
+
               <div className="space-y-2">
-                <BreakdownRow
-                  label="Assertions"
-                  value={test.breakdown.assertions}
-                  max={25}
-                />
-                <BreakdownRow
-                  label="Test Diversity"
-                  value={test.breakdown.diversity}
-                  max={25}
-                />
-                <BreakdownRow
-                  label="Framework Structure"
-                  value={test.breakdown.structure}
-                  max={20}
-                />
-                <BreakdownRow
-                  label="Code Length"
-                  value={test.breakdown.length}
-                  max={15}
-                />
-                <BreakdownRow
-                  label="Formatting"
-                  value={test.breakdown.formatting}
-                  max={15}
-                />
+                <BreakdownRow label="Assertions" value={assertionValue} max={25} />
+                <BreakdownRow label="Test Diversity" value={diversityValue} max={25} />
+                <BreakdownRow label="Framework Structure" value={structureValue} max={20} />
+                <BreakdownRow label="Code Length" value={codeLengthValue} max={15} />
+                <BreakdownRow label="Formatting" value={formattingValue} max={15} />
               </div>
             </div>
-          ) : (
-            <p className="text-xs text-gray-400 italic">
-              No breakdown available for this test
-            </p>
           )}
 
-          {/* Feedback Section */}
-          {normalizedFeedback.length > 0 ? (
+          {normalizedFeedback.length > 0 && (
             <div>
               <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
                 Feedback
               </p>
+
               <ul className="space-y-1">
                 {normalizedFeedback.map((f, idx) => (
                   <li key={idx} className="flex items-start gap-2 text-sm">
-                    {f.type === "error" ? (
-                      <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-                    ) : f.type === "warning" ? (
-                      <AlertTriangle className="w-4 h-4 text-yellow-500 flex-shrink-0 mt-0.5" />
-                    ) : (
-                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    )}
-                    <span
-                      className={
-                        f.type === "error"
-                          ? "text-red-600"
-                          : f.type === "warning"
-                          ? "text-yellow-700"
-                          : "text-green-700"
-                      }
-                    >
+                    {getIcon(f.type)}
+                    <span className={getTextColor(f.type)}>
                       {f.message}
                     </span>
                   </li>
                 ))}
               </ul>
             </div>
-          ) : (
-            <p className="text-sm text-green-600 flex items-center gap-1">
-              <CheckCircle className="w-4 h-4" />
-              No issues found — great test!
-            </p>
           )}
         </div>
       )}
@@ -522,6 +318,7 @@ function TestCard({ test }) {
   );
 }
 
+/* ---------------- BREAKDOWN ROW ---------------- */
 function BreakdownRow({ label, value, max }) {
   const pct = value != null ? Math.min((value / max) * 100, 100) : 0;
   const display = value != null ? `${value}/${max}` : "-";

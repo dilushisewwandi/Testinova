@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "../components/Navbar";
-import { Code2, ClipboardList, GraduationCap, Zap, CheckCircle, TrendingUp, BookOpen, Target } from "lucide-react";
+import {Code2,ClipboardList,GraduationCap,Zap,CheckCircle,TrendingUp,BookOpen,} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -9,9 +9,7 @@ export default function SelectRole() {
 
   React.useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-    }
+    if (!token) navigate("/login");
   }, [navigate]);
 
   const roles = [
@@ -19,183 +17,182 @@ export default function SelectRole() {
       id: "developer",
       title: "Developer",
       subtitle: "Build Robust Tests",
-      description: "Generate AI-powered unit and integration tests from natural language requirements.",
-      icon: <Code2 className="w-12 h-12" />,
+      description:
+        "Generate AI-powered unit and integration tests from requirements.",
+      icon: <Code2 className="w-10 h-10" />,
       color: "blue",
       features: [
-        "Instant unit test generation",
+        "Instant unit/integration test generation",
         "Framework-agnostic approach",
         "Code quality scoring",
         "Multi-language support",
       ],
-      bgGradient: "from-blue-50 to-blue-100",
-      borderColor: "border-blue-300",
-      iconBg: "bg-blue-600",
     },
     {
       id: "qa",
       title: "QA Engineer",
-      subtitle: "Comprehensive Test Coverage",
-      description: "Create automated UI and workflow tests with AI-assisted scenario generation.",
-      icon: <ClipboardList className="w-12 h-12" />,
+      subtitle: "Test Coverage Focus",
+      description:
+        "Create automated UI and workflow tests with AI assistance.",
+      icon: <ClipboardList className="w-10 h-10" />,
       color: "purple",
       features: [
-        "UI test automation",
+        "UI automation tests",
         "Workflow testing",
-        "Coverage analytics",
-        "Test execution reports",
+        "Coverage reports",
+        "Test history tracking",
       ],
-      bgGradient: "from-purple-50 to-purple-100",
-      borderColor: "border-purple-300",
-      iconBg: "bg-purple-600",
     },
     {
       id: "student",
       title: "Student",
-      subtitle: "Master Testing Fundamentals",
-      description: "Learn testing concepts through interactive lessons and hands-on practice exercises.",
-      icon: <GraduationCap className="w-12 h-12" />,
+      subtitle: "Learn Testing Basics",
+      description:
+        "Learn testing concepts step-by-step with guided practice.",
+      icon: <GraduationCap className="w-10 h-10" />,
       color: "green",
       features: [
-        "Structured learning paths",
-        "Conceptual explanations",
-        "Interactive exercises",
+        "Test concept learning",
+        "Simple explanations",
         "Progress tracking",
+        "Learning history tracking"
       ],
-      bgGradient: "from-green-50 to-green-100",
-      borderColor: "border-green-300",
-      iconBg: "bg-green-600",
     },
   ];
 
-  // const handleSelect = (role) => {
-  //   localStorage.setItem("role", role);
-  //   navigate(`/dashboard/${role}`);
-  // };
-
-  const handleSelect = async(role)=>{
+  const handleSelect = async (role) => {
     const token = localStorage.getItem("token");
 
-    await axios.put("http://localhost:5000/api/users/set-role", {role}, {
-      headers:{Authorization: `Bearer ${token}`},
-    });
+    await axios.put(
+      "http://localhost:5000/api/users/set-role",
+      { role },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-    // Save role to both keys so Navbar works correctly
     localStorage.setItem("role", role);
     localStorage.setItem("testinova_role", role);
-    
+
     navigate(`/dashboard/${role}`);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto pt-20 px-6 pb-20">
-        
-        <div className="text-center mb-20">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+      <div className="max-w-6xl mx-auto pt-24 px-6 pb-20">
+
+        <div className="text-center mb-14">
+          <h1 className="text-4xl font-semibold text-gray-900">
             Choose Your Role
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Select your role to access AI-powered testing tools tailored to your workflow. Each role provides specialized features to enhance your testing capabilities.
+          <p className="text-gray-500 mt-3 max-w-2xl mx-auto">
+            Select a role to access your workspace and tools.
           </p>
-          <div className="flex justify-center gap-8 pt-8">
-            <div className="flex items-center gap-2 text-gray-700">
-              <Zap className="w-5 h-5 text-[#1A3FFF]" />
-              <span className="font-medium">AI-Powered</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <CheckCircle className="w-5 h-5 text-[#1A3FFF]" />
-              <span className="font-medium">Instant Results</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <TrendingUp className="w-5 h-5 text-[#1A3FFF]" />
-              <span className="font-medium">Professional Tools</span>
-            </div>
+
+          <div className="flex justify-center gap-6 mt-6 text-sm text-gray-600">
+            <span className="flex items-center gap-1">
+              <Zap className="w-4 h-4 text-blue-600" /> AI Powered
+            </span>
+            <span className="flex items-center gap-1">
+              <CheckCircle className="w-4 h-4 text-blue-600" /> Instant
+            </span>
+            <span className="flex items-center gap-1">
+              <TrendingUp className="w-4 h-4 text-blue-600" /> Insightful
+            </span>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-20">
+        
+        <div className="grid md:grid-cols-3 gap-6">
           {roles.map((role) => (
             <div
               key={role.id}
               onClick={() => handleSelect(role.id)}
-              className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 overflow-hidden cursor-pointer group border-2 border-gray-200 hover:border-gray-300"
+              className="bg-white border border-gray-100 rounded-xl p-6 cursor-pointer
+              hover:border-gray-200 hover:shadow-sm transition"
             >
-             
-              <div className={`bg-gradient-to-r ${role.bgGradient} p-8 flex flex-col items-center relative`}>
-                <div className={`${role.iconBg} text-white p-4 rounded-xl mb-4 group-hover:scale-110 transition duration-300`}>
-                  {role.icon}
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900">{role.title}</h2>
-                <p className="text-sm font-semibold text-gray-600 mt-1">{role.subtitle}</p>
+              
+              <div
+                className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4
+                ${
+                  role.color === "blue"
+                    ? "bg-blue-50 text-blue-600"
+                    : role.color === "purple"
+                    ? "bg-purple-50 text-purple-600"
+                    : "bg-green-50 text-green-600"
+                }`}
+              >
+                {role.icon}
               </div>
 
-              {/* Card Body */}
-              <div className="p-8">
-                <p className="text-gray-700 mb-8 leading-relaxed">
-                  {role.description}
-                </p>
+              
+              <h2 className="text-xl font-semibold text-gray-900">
+                {role.title}
+              </h2>
+              <p className="text-sm text-gray-500">{role.subtitle}</p>
 
-                {/* Features List */}
-                <div className="space-y-4 mb-8">
-                  <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Key Features</p>
-                  <ul className="space-y-3">
-                    {role.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-3">
-                        <div className={`w-5 h-5 shrink-0 mt-0.5 ${
-                          role.color === "blue" ? "text-blue-600" :
-                          role.color === "purple" ? "text-purple-600" :
-                          "text-green-600"
-                        }`}>
-                          <CheckCircle className="w-5 h-5" />
-                        </div>
-                        <span className="text-gray-700 text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+              <p className="text-sm text-gray-600 mt-3">
+                {role.description}
+              </p>
 
-                {/* Action Button */}
-                <button
-                  className={`w-full py-3 px-4 rounded-xl font-semibold text-white transition duration-300 
-                    ${role.color === "blue" ? "bg-blue-600 hover:bg-blue-700" : ""}
-                    ${role.color === "purple" ? "bg-purple-600 hover:bg-purple-700" : ""}
-                    ${role.color === "green" ? "bg-green-600 hover:bg-green-700" : ""}
-                    transform group-hover:scale-95 active:scale-90`}
-                >
-                  Get Started
-                </button>
-              </div>
+              
+              <ul className="mt-4 space-y-2 text-sm text-gray-600">
+                {role.features.map((f, i) => (
+                  <li key={i} className="flex gap-2">
+                    <CheckCircle className="w-4 h-4 text-gray-400 mt-0.5" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+           
+              <button
+                className={`mt-5 w-full py-2.5 rounded-lg text-white text-sm font-medium
+                ${
+                  role.color === "blue"
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : role.color === "purple"
+                    ? "bg-purple-600 hover:bg-purple-700"
+                    : "bg-green-600 hover:bg-green-700"
+                }`}
+              >
+                Get Started
+              </button>
             </div>
           ))}
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-12">
-          <div className="grid md:grid-cols-3 gap-12">
-            <div className="text-center">
-              <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-7 h-7 text-blue-600" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Personalized Workspace</h3>
-              <p className="text-gray-600">Each role has a dedicated dashboard with tools optimized for your specific testing needs.</p>
+        
+        <div className="mt-16 bg-white border border-gray-100 rounded-xl p-8">
+          <div className="grid md:grid-cols-3 gap-8 text-center">
+            <div>
+              <BookOpen className="w-6 h-6 mx-auto text-gray-600 mb-2" />
+              <p className="font-medium text-gray-900">
+                Simple Workspace
+              </p>
+              <p className="text-sm text-gray-500">
+                Clean tools per role
+              </p>
             </div>
 
-            <div className="text-center">
-              <div className="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-7 h-7 text-purple-600" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Fast Test Generation</h3>
-              <p className="text-gray-600">Generate comprehensive tests in seconds using our advanced AI engine powered by Llama models.</p>
+            <div>
+              <Zap className="w-6 h-6 mx-auto text-gray-600 mb-2" />
+              <p className="font-medium text-gray-900">
+                Fast Generation
+              </p>
+              <p className="text-sm text-gray-500">
+                AI-powered output
+              </p>
             </div>
 
-            <div className="text-center">
-              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="w-7 h-7 text-green-600" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Quality Insights</h3>
-              <p className="text-gray-600">Get detailed analytics and recommendations to improve your testing practices and code quality.</p>
+            <div>
+              <TrendingUp className="w-6 h-6 mx-auto text-gray-600 mb-2" />
+              <p className="font-medium text-gray-900">
+                Quality Insights
+              </p>
+              <p className="text-sm text-gray-500">
+                Improve continuously
+              </p>
             </div>
           </div>
         </div>

@@ -31,14 +31,14 @@ export default function DeveloperTestHistory() {
   }, []);
 
   const filteredTests = tests.filter((test) =>
-    test.requirementText.toLowerCase().includes(search.toLowerCase())
+    test.requirement.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <DashboardLayout role="developer">
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-8">
 
-        {/* Header */}
+      
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-gray-900">
@@ -50,7 +50,7 @@ export default function DeveloperTestHistory() {
           </div>
         </div>
 
-        {/* Search Bar */}
+   
         <div className="relative mb-8">
           <Search className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
           <input
@@ -62,7 +62,7 @@ export default function DeveloperTestHistory() {
           />
         </div>
 
-        {/* Empty State */}
+    
         {filteredTests.length === 0 && (
           <div className="text-center py-20 bg-white rounded-2xl shadow-md">
             <Code2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
@@ -72,32 +72,30 @@ export default function DeveloperTestHistory() {
           </div>
         )}
 
-        {/* Test Cards */}
+    
         <div className="space-y-6">
           {filteredTests.map((test) => (
             <div
               key={test.id}
               className="bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
             >
-              {/* Card Header */}
+           
               <div className="p-6 flex justify-between items-start">
                 <div>
                   <p className="font-semibold text-gray-800 text-lg">
-                    {test.requirementText}
+                    {test.requirement}
                   </p>
 
                   <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
-                    {/* Framework Badge */}
+               
                     <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full font-medium">
                       {test.framework}
                     </span>
 
-                    {/* Test Type */}
                     <span className="px-3 py-1 bg-purple-100 text-purple-600 rounded-full font-medium">
                       {test.testType}
                     </span>
 
-                    {/* Date */}
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
                       {new Date(test.createdAt).toLocaleString()}
@@ -105,7 +103,6 @@ export default function DeveloperTestHistory() {
                   </div>
                 </div>
 
-                {/* Expand Button */}
                 <button
                   onClick={() =>
                     setExpandedId(expandedId === test.id ? null : test.id)
@@ -120,7 +117,7 @@ export default function DeveloperTestHistory() {
                 </button>
               </div>
 
-              {/* Code Section */}
+              
               {expandedId === test.id && (
                 <div className="bg-gray-900 text-green-400 text-sm p-6 overflow-x-auto">
                   <pre className="whitespace-pre-wrap">
