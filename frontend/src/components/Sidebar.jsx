@@ -23,7 +23,7 @@ export default function Sidebar({ role }) {
     student: [
       { label: "Dashboard", icon: <Home size={18} />, path: `/dashboard/student` },
       { label: "Learning Concepts", icon: <FileText size={18} />, path: `/student/learn` },
-      { label: "Practice", icon: <Target size={18} />, path: `/student/practice` },
+      // { label: "Practice", icon: <Target size={18} />, path: `/student/practice` },
       { label: "Learning History", icon: <History size={18} />, path: `/student/learning-history` },
     ],
   };

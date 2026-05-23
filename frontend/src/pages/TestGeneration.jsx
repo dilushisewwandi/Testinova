@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
-import { Copy, Loader2, Download, BookOpen } from "lucide-react";
+import { BookOpen, Copy, Loader2 } from "lucide-react";
 
 export default function TestGeneration({ role }) {
   const [input, setInput] = useState("");
@@ -10,19 +10,14 @@ export default function TestGeneration({ role }) {
   const [testType, setTestType] = useState("");
   const [testSubType, setTestSubType] = useState("");
   const [loading, setLoading] = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const [currentTestId, setCurrentTestId] = useState(null);
-  const [exportFramework, setExportFramework] = useState("");
 
   useEffect(() => {
     if (role === "developer") {
       setFramework("pytest");
       setTestType("unit");
-      setExportFramework("jest");
     } else if (role === "qa") {
       setFramework("selenium");
       setTestSubType("ui");
-      setExportFramework("selenium");
     }
   }, [role]);
 
@@ -37,7 +32,7 @@ export default function TestGeneration({ role }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           requirementText: input,
@@ -50,294 +45,161 @@ export default function TestGeneration({ role }) {
 
       const data = await response.json();
       setOutput(data.generatedCode);
-      setCurrentTestId(data.id);
+      
     } catch (error) {
-      console.error(error);
       setOutput(`Error generating ${role === "developer" ? "test" : "strategy"}`);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleExport = async () => {
-    if (!currentTestId || !exportFramework) {
-      alert("Please generate a test first and select export framework");
-      return;
-    }
+  const Card = ({ children }) => (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+      {children}
+    </div>
+  );
 
-    try {
-      setExporting(true);
-      const token = localStorage.getItem("token");
-
-      const response = await fetch("http://localhost:5000/api/tests/export", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          testId: currentTestId,
-          targetFramework: exportFramework,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Export failed");
-      }
-
-      // Create blob and download
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${role}_test_${new Date().toISOString().split("T")[0]}.${getFileExtension(exportFramework)}`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-
-    } catch (error) {
-      console.error("Export error:", error);
-      alert(`Export failed: ${error.message}`);
-    } finally {
-      setExporting(false);
-    }
-  };
-
-  const getFileExtension = (framework) => {
-    const extensions = {
-      jest: "js",
-      cypress: "js",
-      playwright: "js",
-      pytest: "py",
-      selenium: "py",
-      junit: "java",
-    };
-    return extensions[framework] || "txt";
-  };
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(output);
-  };
 
   return (
     <DashboardLayout role={role}>
-      {/* Header */}
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold text-gray-900">
-          {role === "developer" 
-            ? `Generate ${testType === "integration" ? "Integration" : "Unit"} Tests` 
-            : `Generate ${testSubType === "workflow" ? "Workflow" : "UI"} Testing Strategy`}
-        </h1>
-        <p className="text-gray-500 mt-2">
-          {role === "developer"
-            ? "Convert natural language requirements into runnable test code."
-            : "Get comprehensive testing strategies and scenarios for UI automation."}
-        </p>
-      </div>
+      <div className="min-h-screen bg-gray-50 px-6 py-8">
 
-      <div className="grid md:grid-cols-2 gap-10">
-
-        {/* Input Section */}
-        <div className="bg-white p-8 rounded-2xl shadow-md">
-          <h2 className="text-xl font-semibold mb-6">
-            {role === "developer" ? "Code / Requirement" : "Feature / UI Specification"}
-          </h2>
-
-          <textarea
-            className="w-full h-64 p-4 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-[#1A3FFF] outline-none"
-            placeholder={role === "developer" 
-              ? "Paste your code or describe the requirement..." 
-              : "Describe the feature, user flow, or UI component..."}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-
-          {/* Test Type Selector (Developer Only) */}
-          {role === "developer" && (
-            <div className="mt-6">
-              <label className="text-sm text-gray-600">
-                Test Type
-              </label>
-              <div className="flex gap-3 mt-2">
-                <button
-                  onClick={() => setTestType("unit")}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
-                    testType === "unit"
-                      ? "bg-[#1A3FFF] text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  Unit Tests
-                </button>
-                <button
-                  onClick={() => setTestType("integration")}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
-                    testType === "integration"
-                      ? "bg-[#1A3FFF] text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  Integration Tests
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Test Sub Type Selector (QA Only) */}
-          {role === "qa" && (
-            <div className="mt-6">
-              <label className="text-sm text-gray-600">
-                Test Scope
-              </label>
-              <div className="flex gap-3 mt-2">
-                <button
-                  onClick={() => setTestSubType("ui")}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
-                    testSubType === "ui"
-                      ? "bg-[#1A3FFF] text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  UI Tests
-                </button>
-                <button
-                  onClick={() => setTestSubType("workflow")}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
-                    testSubType === "workflow"
-                      ? "bg-[#1A3FFF] text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  Workflow Tests
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Framework Selector */}
-          <div className="mt-6">
-            <label className="text-sm text-gray-600">
-              Select Framework
-            </label>
-            <select
-              value={framework}
-              onChange={(e) => setFramework(e.target.value)}
-              className="w-full mt-2 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1A3FFF] outline-none"
-            >
-              {role === "developer" ? (
-                <>
-                  <option value="pytest">Pytest (Python)</option>
-                  <option value="jest">Jest (JavaScript)</option>
-                  <option value="junit">JUnit (Java)</option>
-                </>
-              ) : (
-                <>
-                  <option value="selenium">Selenium</option>
-                  <option value="cypress">Cypress</option>
-                  <option value="playwright">Playwright</option>
-                </>
-              )}
-            </select>
-          </div>
-
-          {/* Generate Button */}
-          <button
-            onClick={handleGenerate}
-            className="mt-6 w-full bg-gradient-to-r from-[#1A3FFF] to-indigo-500 text-white py-3 rounded-xl shadow hover:scale-105 transition duration-300 flex justify-center items-center gap-2"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="animate-spin" size={18} />
-                {role === "developer" ? "Generating Tests..." : "Generating Strategy..."}
-              </>
-            ) : (
-              role === "developer" ? "Generate Test Code" : "Generate Strategy"
-            )}
-          </button>
+        <div className="mb-10">
+          <h1 className="text-3xl font-semibold text-gray-900 flex items-center gap-3">
+            <BookOpen className="text-[#1A3FFF]" />
+            Test Generation
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Convert requirements into clean, runnable test cases
+          </p>
         </div>
 
-        {/* Output Section */}
-        <div className="bg-white p-8 rounded-2xl shadow-md relative">
-          <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-            {role === "developer" ? (
-              "Generated Test Cases"
-            ) : (
-              "Testing Strategy & Scenarios"
-            )}
-          </h2>
+        <div className="grid lg:grid-cols-1 gap-8 max-w-4xl mx-auto">
 
-          {output && (
-            <button
-              onClick={copyToClipboard}
-              className="absolute top-8 right-8 text-gray-500 hover:text-[#1A3FFF]"
-            >
-              <Copy size={18} />
-            </button>
-          )}
-
-          {/* Student Structured Learning Display */}
-          {role === "student" ? (
-            <div className="text-center py-12 text-gray-500">
-              <BookOpen size={48} className="mx-auto mb-4 opacity-50" />
-              <p>Enter a requirement above and click "Learn & Practice" to get a structured learning experience!</p>
+       
+          <Card>
+            <div className="p-6 border-b border-gray-100">
+              <h2 className="text-lg font-semibold">Describe Requirement</h2>
+              <p className="text-sm text-gray-500">
+                Write or paste your feature description
+              </p>
             </div>
-          ) : (
-            // Developer/QA code display
-            <pre className="bg-[#0B1020] text-white rounded-xl p-4 h-80 overflow-auto text-sm whitespace-pre-wrap break-words">
-              {output || (role === "developer" ? "// Generated test cases will appear here..." : "// Testing strategy and scenarios will appear here...")}
-            </pre>
-          )}
 
-          {/* Export Section - Only show for developer/QA, not students */}
-          {output && role !== "student" && (
-            <div className="mt-6 p-4 bg-gray-50 rounded-xl">
-              <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <Download size={16} />
-                Export Test
-              </h3>
-              
-              <div className="mb-3">
-                <label className="block text-sm font-medium mb-2">
-                  Export Framework
-                </label>
-                <select
-                  value={exportFramework}
-                  onChange={(e) => setExportFramework(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1A3FFF] outline-none"
-                >
-                  <option value="jest">Jest (JavaScript)</option>
-                  <option value="pytest">Pytest (Python)</option>
-                  <option value="junit">JUnit (Java)</option>
-                  <option value="selenium">Selenium (Python)</option>
-                  <option value="cypress">Cypress (JavaScript)</option>
-                  <option value="playwright">Playwright (JavaScript)</option>
-                </select>
-              </div>
+            <div className="p-6">
+              <textarea
+                className="w-full h-56 p-4 rounded-xl bg-gray-50 focus:bg-white border border-gray-100 focus:border-blue-200 outline-none resize-none transition"
+                placeholder={
+                  role === "developer"
+                    ? "Enter code or requirement..."
+                    : "Describe UI / feature flow..."
+                }
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+              />
 
-              <button
-                onClick={handleExport}
-                disabled={exporting || !currentTestId}
-                className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2 transition duration-300"
-              >
-                {exporting ? (
-                  <>
-                    <Loader2 className="animate-spin" size={16} />
-                    Exporting...
-                  </>
-                ) : (
-                  <>
-                    <Download size={16} />
-                    Export as .{getFileExtension(exportFramework)} file
-                  </>
+              <div className="mt-5 space-y-4">
+
+                {role === "developer" && (
+                  <div className="flex gap-3">
+                    {["unit", "integration"].map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setTestType(t)}
+                        className={`flex-1 py-2 rounded-xl text-sm font-medium transition ${
+                          testType === t
+                            ? "bg-[#1A3FFF] text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {t === "unit" ? "Unit Tests" : "Integration"}
+                      </button>
+                    ))}
+                  </div>
                 )}
-              </button>
-            </div>
-          )}
-        </div>
 
+                {role === "qa" && (
+                  <div className="flex gap-3">
+                    {["ui", "workflow"].map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setTestSubType(t)}
+                        className={`flex-1 py-2 rounded-xl text-sm font-medium transition ${
+                          testSubType === t
+                            ? "bg-[#1A3FFF] text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {t.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <select
+                  value={framework}
+                  onChange={(e) => setFramework(e.target.value)}
+                  className="w-full p-3 rounded-xl bg-gray-50 border border-gray-100 focus:border-blue-200 outline-none"
+                >
+                  {role === "developer" ? (
+                    <>
+                      <option value="pytest">Pytest</option>
+                      <option value="jest">Jest</option>
+                      <option value="junit">JUnit</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="selenium">Selenium</option>
+                      <option value="cypress">Cypress</option>
+                      <option value="playwright">Playwright</option>
+                    </>
+                  )}
+                </select>
+
+                <button
+                  onClick={handleGenerate}
+                  className="w-full bg-[#1A3FFF] text-white py-3 rounded-xl hover:opacity-90 transition flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="animate-spin" size={18} />
+                      Generating...
+                    </>
+                  ) : (
+                    "Generate"
+                  )}
+                </button>
+              </div>
+            </div>
+          </Card>
+
+          <Card>
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Output</h2>
+
+              {output && (
+                <button
+                  onClick={() => navigator.clipboard.writeText(output)}
+                  className="text-gray-500 hover:text-blue-600"
+                >
+                  <Copy size={18} />
+                </button>
+              )}
+            </div>
+
+            <div className="p-6">
+              <pre className="bg-gray-900 text-gray-100 p-4 rounded-xl text-sm min-h-[260px] overflow-auto whitespace-pre-wrap">
+                {output || "Generated output will appear here..."}
+              </pre>
+            </div>
+          </Card>
+
+        </div>
       </div>
     </DashboardLayout>
   );
 }
+
+
+
+
+

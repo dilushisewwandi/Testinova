@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { buttonStyles, inputStyles, gradients } from "../assets/dummyStyles";
+import Notification from "../components/Notification";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -9,10 +9,28 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [notification, setNotification] = useState(null);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleLogin = async () => {
-    if (!email.trim() || !password.trim()) {
-      alert("Please enter both email and password.");
+    if (!validateForm()) {
       return;
     }
 
@@ -22,107 +40,110 @@ export default function Login() {
       const res = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email.trim(),
-          password: password.trim(),
-        }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        // localStorage.setItem("token", data.token);
-        // localStorage.setItem("username", data.user.name);
-        // localStorage.setItem("role", data.user.role || "");
-        // localStorage.setItem("userEmail", email.trim());
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", data.user.name);
         localStorage.setItem("role", data.user.role || "");
         localStorage.setItem("testinova_role", data.user.role || "");
-        localStorage.setItem("userEmail", email.trim());
+        localStorage.setItem("userEmail", email);
 
-        const user = data.user;
-
-        alert(data.message);
-
-        if (!user.role){
-          navigate("/select-role");
-        }else{
-          navigate (`/dashboard/${user.role}`);
-        }
+        setNotification({ message: "Login successful! Redirecting...", type: "success" });
+        setTimeout(() => {
+          if (!data.user.role) {
+            navigate("/select-role");
+          } else {
+            navigate(`/dashboard/${data.user.role}`);
+          }
+        }, 2000);
       } else {
-        alert(data.message || "Login failed");
+        setNotification({ message: data.message || "Login failed", type: "error" });
       }
-
-    } catch (error) {
-      alert("Server error. Please try again.");
+    } catch (err) {
+      setNotification({ message: "Server error. Please try again.", type: "error" });
     } finally {
       setLoading(false);
     }
   };
 
-  // useEffect(() => {
-  //   // if already logged in, go straight to role selection
-  //   const token = localStorage.getItem("token");
-  //   if (token) {
-  //     navigate("/select-role");
-  //   }
-  // }, [navigate]);
+  const closeNotification = () => {
+    setNotification(null);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={closeNotification}
+        />
+      )}
 
-      {/* background decorations similar to landing */}
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-60 h-60 rounded-full bg-blue-500 opacity-10 blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-60 h-60 rounded-full bg-purple-500 opacity-10 blur-3xl"></div>
+      <div className="flex justify-center items-center min-h-screen px-4">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-10 border border-gray-200">
 
-      <div className="flex justify-center items-center pt-32 pb-20 px-4 relative z-10">
-        <div className="w-full max-w-md bg-white shadow-xl rounded-3xl p-12">
-          <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-6">
-            Login
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-2">
+            Welcome Back
           </h2>
 
-          {/* Email */}
+          <p className="text-center text-gray-500 mb-8 text-sm">
+            Login to continue to Testinova
+          </p>
+
+      
           <div className="mb-5">
-            <label className="block text-gray-700 font-medium mb-1">
-              Email
-            </label>
+            <label className="block text-sm text-gray-700 mb-1">Email</label>
             <input
               type="email"
-              className={inputStyles.base}
-              placeholder="you@example.com"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 ${
+                errors.email
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:border-[#1A3FFF] focus:ring-[#1A3FFF]"
+              }`}
             />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+            )}
           </div>
 
-          {/* Password */}
-          <div className="mb-8">
-            <label className="block text-gray-700 font-medium mb-1">
-              Password
-            </label>
+      
+          <div className="mb-6">
+            <label className="block text-sm text-gray-700 mb-1">Password</label>
             <input
               type="password"
-              className={inputStyles.base}
-              placeholder="••••••••"
+              placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 ${
+                errors.password
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:border-[#1A3FFF] focus:ring-[#1A3FFF]"
+              }`}
             />
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            )}
           </div>
 
           <button
             onClick={handleLogin}
             disabled={loading}
-            className={`${buttonStyles.primary} ${
-              loading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
+            className="w-full bg-[#1A3FFF] text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
 
-          <p className="text-center text-gray-600 mt-6">
+          <p className="text-center text-sm mt-6 text-gray-600">
             Don’t have an account?{" "}
             <button
               onClick={() => navigate("/signup")}

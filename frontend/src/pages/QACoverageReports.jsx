@@ -1,32 +1,29 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import DashboardLayout from "../layouts/DashboardLayout";
-import { AlertCircle, CheckCircle2, Info } from "lucide-react";
+import { AlertCircle, CheckCircle2, Info, ChevronDown, ChevronUp } from "lucide-react";
 
 const QACoverageReports = () => {
   const [tests, setTests] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [expandedTests, setExpandedTests] = useState({});
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchQAReports = async () => {
       try {
         const token = localStorage.getItem("token");
+
         const res = await axios.get(
           "http://localhost:5000/api/quality/qa-coverage-reports",
-          { headers: { Authorization: `Bearer ${token}` } }
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
         );
-        // Filter only QA tests (UI and Workflow)
-        const qaTests = res.data.reports.filter((test) => {
-          const role = test.role || (["ui", "workflow"].includes((test.testType || "").toLowerCase()) ? "qa" : "developer");
-          return role === "qa";
-        });
-        setTests(qaTests);
-        setLoading(false);
+
+        setTests(res.data.reports || []);
       } catch (err) {
-        console.error("Error fetching QA coverage reports:", err);
-        setError("Failed to load QA coverage reports");
+        console.error(err);
+      } finally {
         setLoading(false);
       }
     };
@@ -34,50 +31,45 @@ const QACoverageReports = () => {
     fetchQAReports();
   }, []);
 
-  const getScoreColor = (score) => {
-    if (score >= 75) return "#10b981"; // green
-    if (score >= 50) return "#f59e0b"; // yellow
-    return "#ef4444"; // red
-  };
-
-  const getScoreCategory = (score) => {
-    if (score >= 75) return "Excellent";
-    if (score >= 50) return "Good";
-    return "Needs Improvement";
-  };
-
-  const toggleExpand = (testId) => {
+  const toggleExpand = (id) => {
     setExpandedTests((prev) => ({
       ...prev,
-      [testId]: !prev[testId],
+      [id]: !prev[id],
     }));
+  };
+
+  
+  const getScoreColor = (score) => {
+    if (score >= 75) return "text-green-600 bg-green-100";
+    if (score >= 50) return "text-orange-500 bg-orange-100";
+    return "text-red-500 bg-red-100";
+  };
+
+  const getProgressColor = (score) => {
+    if (score >= 75) return "bg-green-500";
+    if (score >= 50) return "bg-orange-400";
+    return "bg-red-400";
   };
 
   const getSeverityIcon = (type) => {
     switch (type) {
       case "error":
-        return <AlertCircle className="w-4 h-4 text-red-500" />;
+        return <AlertCircle className="text-red-500 w-4 h-4" />;
       case "warning":
-        return <AlertCircle className="w-4 h-4 text-yellow-500" />;
+        return <AlertCircle className="text-orange-400 w-4 h-4" />;
       case "info":
-        return <Info className="w-4 h-4 text-blue-500" />;
+        return <Info className="text-gray-400 w-4 h-4" />;
       default:
-        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+        return <CheckCircle2 className="text-green-500 w-4 h-4" />;
     }
   };
 
   if (loading) {
     return (
       <DashboardLayout role="qa">
-        <div className="p-8 text-center">Loading QA coverage reports...</div>
-      </DashboardLayout>
-    );
-  }
-
-  if (error) {
-    return (
-      <DashboardLayout role="qa">
-        <div className="p-8 text-center text-red-600">{error}</div>
+        <div className="p-10 text-center text-gray-400 text-lg">
+          Loading QA reports...
+        </div>
       </DashboardLayout>
     );
   }
@@ -85,179 +77,163 @@ const QACoverageReports = () => {
   return (
     <DashboardLayout role="qa">
       <div className="p-8 bg-gray-50 min-h-screen">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          QA Coverage Reports
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Individual test coverage analysis and quality metrics
-        </p>
 
-        {tests.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-lg">
-            <p className="text-gray-500">No QA tests found</p>
+    
+        <div className="mb-10">
+          <h1 className="text-4xl font-bold text-gray-900">
+            Coverage Reports
+          </h1>
+          <p className="text-gray-500 mt-1">
+            QA reports
+          </p>
+        </div>
+
+        {tests.length === 0 && (
+          <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
+            <p className="text-gray-400 text-lg">No QA reports found</p>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {tests.map((test) => (
+        )}
+
+        
+        <div className="space-y-6">
+          {tests.map((test, index) => {
+
+            let feedback = test.feedback;
+
+            if (typeof feedback === "string") {
+              try {
+                feedback = JSON.parse(feedback);
+              } catch {
+                feedback = [];
+              }
+            }
+
+            if (!Array.isArray(feedback)) feedback = [];
+
+            return (
               <div
-                key={test.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden"
+                key={test.id || index}
+                className="bg-white rounded-2xl shadow-sm hover:shadow-md transition duration-300"
               >
-                {/* Header */}
+
                 <div
-                  className="p-6 cursor-pointer hover:bg-gray-50 transition"
+                  className="p-6 cursor-pointer flex justify-between items-start"
                   onClick={() => toggleExpand(test.id)}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h2 className="text-lg font-semibold text-gray-900">
-                          {test.framework || "Unknown"} - {test.testType || "Test"}
-                        </h2>
-                        <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-                          {test.role || "QA"}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {test.requirementText}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div
-                        className="text-3xl font-bold"
-                        style={{ color: getScoreColor(test.qualityScore) }}
-                      >
-                        {Math.round(test.qualityScore)}%
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {getScoreCategory(test.qualityScore)}
-                      </p>
-                    </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      {test.framework} - {test.testType}
+                    </h2>
+
+                    <p className="text-gray-500 text-sm mt-1 line-clamp-2">
+                      {test.requirementText}
+                    </p>
                   </div>
 
-                  {/* Score Bar */}
-                  <div className="mt-4">
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div
-                        className="h-3 rounded-full transition-all"
-                        style={{
-                          width: `${test.qualityScore}%`,
-                          backgroundColor: getScoreColor(test.qualityScore),
-                        }}
-                      />
+                  <div className="flex items-center gap-3">
+
+              
+                    <div
+                      className={`px-4 py-1.5 rounded-full text-sm font-semibold ${getScoreColor(
+                        test.qualityScore
+                      )}`}
+                    >
+                      {Math.round(test.qualityScore || 0)}%
                     </div>
-                    {test.coverageEstimate && (
-                      <p className="text-xs text-gray-500 mt-2">
-                        Coverage Estimate: {Math.round(test.coverageEstimate)}%
-                      </p>
-                    )}
+
+                    {expandedTests[test.id] ? <ChevronUp /> : <ChevronDown />}
                   </div>
                 </div>
 
-                {/* Expanded Details */}
+         
+                <div className="px-6 pb-5">
+                  <div className="w-full h-2 rounded-full bg-gray-100">
+                    <div
+                      className={`h-2 rounded-full ${getProgressColor(
+                        test.qualityScore
+                      )}`}
+                      style={{
+                        width: `${test.qualityScore || 0}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+         
                 {expandedTests[test.id] && (
-                  <>
-                    <div className="border-t">
-                      {/* Score Breakdown */}
-                      {test.breakdown && (
-                        <div className="p-6 bg-gray-50">
-                          <h3 className="font-semibold text-gray-900 mb-4">
-                            Score Breakdown
-                          </h3>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {Object.entries(test.breakdown).map(
-                              ([key, value]) => (
-                                <div key={key} className="bg-white p-3 rounded">
-                                  <p className="text-xs text-gray-600 capitalize">
-                                    {key.replace(/([A-Z])/g, " $1").trim()}
-                                  </p>
-                                  <p className="text-lg font-bold text-gray-900">
-                                    {value !== null ? typeof value === 'number' ? value.toFixed(1) : value : "N/A"}
-                                  </p>
-                                </div>
-                              )
-                            )}
-                          </div>
-                        </div>
-                      )}
+                  <div className="bg-gray-50/60">
 
-                      {/* Feedback Items */}
-                      {test.feedback && test.feedback.length > 0 && (
-                        <div className="p-6">
-                          <h3 className="font-semibold text-gray-900 mb-4">
-                            Feedback
-                          </h3>
-                          <div className="space-y-2">
-                            {test.feedback.map((item, idx) => (
-                              <div
-                                key={idx}
-                                className="flex items-start gap-3 p-3 bg-gray-50 rounded"
-                              >
-                                {getSeverityIcon(item.type)}
-                                <div className="flex-1">
-                                  <p className="text-sm text-gray-900">
-                                    {item.message}
-                                  </p>
-                                  <p className="text-xs text-gray-500 capitalize">
+             
+                    <div className="p-6">
+                      <h3 className="font-semibold mb-4 text-gray-800">
+                        Feedback
+                      </h3>
+
+                      {feedback.length === 0 ? (
+                        <p className="text-gray-400">
+                          No feedback available
+                        </p>
+                      ) : (
+                        <div className="space-y-3">
+                          {feedback.map((item, idx) => (
+                            <div
+                              key={`${test.id}-${idx}`}
+                              className="flex items-start gap-3 bg-white p-3 rounded-lg shadow-sm"
+                            >
+                              {getSeverityIcon(item.type)}
+                              <div>
+                                <p className="text-sm text-gray-700">
+                                  {item.message || item}
+                                </p>
+                                {item.type && (
+                                  <span className="text-xs text-gray-400">
                                     {item.type}
-                                  </p>
-                                </div>
+                                  </span>
+                                )}
                               </div>
-                            ))}
-                          </div>
+                            </div>
+                          ))}
                         </div>
                       )}
+                    </div>
 
-                      {/* Test Code */}
-                      {test.generatedCode && (
-                        <div className="p-6 border-t">
-                          <h3 className="font-semibold text-gray-900 mb-3">
-                            Test Code
-                          </h3>
-                          <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto max-h-96 text-xs">
-                            {test.generatedCode}
-                          </pre>
-                        </div>
-                      )}
+                
+                    <div className="p-6">
+                      <h3 className="font-semibold mb-3 text-gray-800">
+                        Generated Test Code
+                      </h3>
 
-                      {/* Metadata */}
-                      <div className="p-6 border-t bg-gray-50">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                          <div>
-                            <p className="text-gray-600">Framework</p>
-                            <p className="font-semibold text-gray-900">
-                              {test.framework || "N/A"}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600">Test Type</p>
-                            <p className="font-semibold text-gray-900">
-                              {test.testType || "N/A"}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600">Created</p>
-                            <p className="font-semibold text-gray-900">
-                              {test.createdAt
-                                ? new Date(test.createdAt).toLocaleDateString()
-                                : "N/A"}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600">Test ID</p>
-                            <p className="font-semibold text-gray-900">
-                              #{test.id}
-                            </p>
-                          </div>
-                        </div>
+                      <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs overflow-auto max-h-96">
+                        {test.generatedCode}
+                      </pre>
+                    </div>
+
+               
+                    <div className="p-6 text-sm text-gray-600 grid md:grid-cols-3 gap-4">
+                      <div>
+                        <p className="text-gray-400">Framework</p>
+                        <p className="font-semibold">{test.framework}</p>
+                      </div>
+
+                      <div>
+                        <p className="text-gray-400">Test Type</p>
+                        <p className="font-semibold">{test.testType}</p>
+                      </div>
+
+                      <div>
+                        <p className="text-gray-400">Created</p>
+                        <p className="font-semibold">
+                          {new Date(test.createdAt).toLocaleDateString()}
+                        </p>
                       </div>
                     </div>
-                  </>
+
+                  </div>
                 )}
               </div>
-            ))}
-          </div>
-        )}
+            );
+          })}
+        </div>
       </div>
     </DashboardLayout>
   );

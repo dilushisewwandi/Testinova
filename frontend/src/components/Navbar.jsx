@@ -43,7 +43,7 @@ const Navbar = () => {
             <span className="font-bold text-lg text-gray-900 hidden sm:inline">Testinova</span>
           </Link>
 
-          {/* Desktop Navigation */}
+
           {isLandingPage && (
             <div className="hidden md:flex items-center gap-8">
               {navItems.map((item) => (
@@ -58,7 +58,7 @@ const Navbar = () => {
             </div>
           )}
 
-          {/* Right Container */}
+        
           <div className="flex items-center gap-4">
             {!token ? (
               <>
@@ -85,7 +85,7 @@ const Navbar = () => {
               </button>
             )}
 
-            {/* Mobile Menu Button */}
+         
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden text-gray-700"
@@ -99,7 +99,7 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+    
         {mobileMenuOpen && isLandingPage && (
           <div className="md:hidden mt-4 pt-4 border-t border-gray-200 space-y-3">
             {navItems.map((item) => (
@@ -126,7 +126,6 @@ const Navbar = () => {
           </div>
         )}
 
-        {/* Mobile Menu for Authenticated Users */}
         {mobileMenuOpen && token && (
           <div className="md:hidden mt-4 pt-4 border-t border-gray-200 space-y-3">
             <button

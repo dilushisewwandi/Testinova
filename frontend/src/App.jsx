@@ -9,7 +9,7 @@ import TestGeneration from "./pages/TestGeneration"
 import Signup from "./pages/Signup"
 import Login from "./pages/Login"
 import LearningPage from "./pages/LearningPage"
-import PracticePage from "./pages/PracticePage"
+// import PracticePage from "./pages/PracticePage"
 import DeveloperTestHistory from "./pages/DeveloperTestHistory"
 import QATestHistory from "./pages/QATestHistory"
 // import QualityReports from "./pages/QualityReports"
@@ -40,7 +40,7 @@ const App = () => {
         <Route path="/reports/qa" element={<QACoverageReports />} />
         <Route path="/student/generate-test" element={<TestGeneration role={"student"}/>}/>
         <Route path="/student/learn" element={<LearningPage />}/>
-        <Route path="/student/practice" element={<PracticePage/>}/>
+        {/* <Route path="/student/practice" element={<PracticePage/>}/> */}
         <Route path="/student/learning-history" element={<StudentLearningHistory />}/>
        
       </Routes>
