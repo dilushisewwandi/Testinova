@@ -18,7 +18,7 @@ export const TestGeneration = sequelize.define(
         type: DataTypes.TEXT,
         allowNull: false,
     },
-    requirementText: {
+    requirement: {
         type: DataTypes.TEXT,
         allowNull: false, 
     },
