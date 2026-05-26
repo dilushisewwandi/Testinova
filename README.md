@@ -87,22 +87,22 @@ npm run dev
 ## 🖼️ Screenshots
 
 ### QA Engineer Dashboard
-![QA Engineer Dashboard](images/qa-dashboard.png)
+![QA Engineer Dashboard](images/qa_dash.png)
 
 ### Developer Dashboard
-![Developer Dashboard](images/developer-dashboard.png)
+![Developer Dashboard](images/dev_dash.png)
 
 ### Developer Test Generation Output
-![Developer Test Generation Output](images/developer-output.png)
+![Developer Test Generation Output](images/test_output.png)
 
 ### Developer Quality Reports
-![Developer Quality Reports](images/developer-quality-reports.png)
+![Developer Quality Reports](images/reports.png)
 
 ### QA Coverage Reports
-![QA Coverage Reports](images/qa-coverage-reports.png)
+![QA Coverage Reports](images/coverage_report.png)
 
 ### Student Learning Concepts
-![Student Learning Concepts](images/student-learning.png)
+![Student Learning Concepts](images/st_output.png)
 
 ## 📁 Project Structure (high level)
 - `ai-service/` — NLP & test generation API (FastAPI + spaCy + OpenAI calls)
