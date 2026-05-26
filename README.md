@@ -84,6 +84,25 @@ cd frontend
 npm install
 npm run dev
 ```
+## 🖼️ Screenshots
+
+### QA Engineer Dashboard
+![QA Engineer Dashboard](images/qa-dashboard.png)
+
+### Developer Dashboard
+![Developer Dashboard](images/developer-dashboard.png)
+
+### Developer Test Generation Output
+![Developer Test Generation Output](images/developer-output.png)
+
+### Developer Quality Reports
+![Developer Quality Reports](images/developer-quality-reports.png)
+
+### QA Coverage Reports
+![QA Coverage Reports](images/qa-coverage-reports.png)
+
+### Student Learning Concepts
+![Student Learning Concepts](images/student-learning.png)
 
 ## 📁 Project Structure (high level)
 - `ai-service/` — NLP & test generation API (FastAPI + spaCy + OpenAI calls)
